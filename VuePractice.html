@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+<!--prevents the flicker of the head tag back to the form between loading-->
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    .highlight {
+        border: solid 3px red;
+        color: red;
+    }
+</style>
+
+<div id="app">
+    <div class="container">
+        <div class="card mt-5">
+            <h2 class="card-header">Near-Earth Objects</h2>
+            <div class="m-3" v-cloak v-if="numAsteroids > 0">
+                <p>Showing {{numAsteroids}} Items</p>
+                <p>{{closestObject}} that has the shortest miss distance</p>
+            </div>
+            <table class="table table-striped">
+                <thead class="thead-light">
+                <th>#</th>
+                <th>Name</th>
+                <th>Close Approach Date</th>
+                <th>Miss Distance</th>
+                <th>Remove</th>
+                </thead>
+                <tbody v-cloak>
+                <tr v-for="(a, index) in asteroids"  :key="a.neo_reference_id"
+                    :class="{highlight: isMissingData(a), 'shadow-sm': true}">
+
+                    <td>{{index + 1}}</td>
+                    <td>{{a.name}}</td>
+                    <td>{{getCloseApproachDate(a)}}</td>
+                    <td>
+                        <ul v-if="a.close_approach_data.length > 0">
+                            <li v-for="(value, key, index) in a.close_approach_data[0].miss_distance">
+                                {{key}}: {{value}}
+                            </li>
+                        </ul>
+                    </td>
+                    <td><button @click="remove(index)"  class="btn btn-warning">remove</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--        <img :src="imgSrc" :title="imgTitle">-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // view render
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            asteroids: []
+            // imgSrc: '',
+            // imgTitle: ''
+            // renders email address inside input
+            // email: 'jtalltree79@gmail.com',
+            // submitted: false
+        },
+        // Life cycle hook
+        computed: {
+            numAsteroids: function () {
+                return this.asteroids.length;
+            },
+            closestObject: function () {
+                var neosHavingData = this.asteroids.filter(function (neo) {
+                    return neo.close_approach_data.length > 0;
+                });
+                var simpleNeos = neosHavingData.map(function (neo) {
+                    return {name: neo.name, miles: neo.close_approach_data[0].miss_distance.miles};
+                });
+                var sortedNeos = simpleNeos.sort(function (a, b) {
+                    return a.miles - b.miles;
+                });
+                return sortedNeos[0].name;
+            }
+        },
+        created: function () {
+            this.fetchAsteriods();
+        },
+        // fetch img from NASA
+        methods: {
+            fetchAsteriods: function () {
+                var apiKey = 'FpKYi8JtNeYOGbHrDzSqgm1nLGahVL4b3gh6MnvD';
+                var url = 'https://api.nasa.gov/neo/rest/v1/neo/browse?api_key=' + apiKey;
+                axios.get(url)
+                    .then(function (res) {
+                        vm.asteroids = res.data.near_earth_objects.slice(0, 10)
+                        // vm.imgSrc = res.data.url;
+                        // vm.imgTitle = res.data.title;
+                    });
+            },
+            getCloseApproachDate: function (a) {
+                if (a.close_approach_data.length > 0) {
+                    return a.close_approach_data[0].close_approach_date;
+                }
+                return 'N/A'
+            },
+            remove: function (index) {
+                this.asteroids.splice(index, 1);
+
+            },
+            isMissingData: function (a) {
+                return a.close_approach_data.length == 0;
+            }
+        }
+    });
+</script>
+
+<!--<form v-show="!submitted" class="mt-5">-->
+<!--    <div class="form-group">-->
+<!--        <label for="email">Email</label>-->
+<!--        <input id="email" type="email" v-model="email" class="form-control form-control-lg">-->
+<!--    </div>-->
+<!--    <button type="submit" @click.prevent="process" class="btn btn-primary">Submit</button>-->
+<!--</form>-->
+<!--<h2 v-show="submitted" v-cloak class="mt-5">Thanks for signing up!</h2>-->
