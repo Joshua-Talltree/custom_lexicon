@@ -55,7 +55,7 @@ public class PostController {
 
     @PostMapping("/posts/search")
     public String searchPosts(@RequestParam(name = "word") String term, Model vModel) {
-        vModel.addAttribute("posts", postDao.findAllByContentContains(term));
+        vModel.addAttribute("posts", postDao.findAllByDefinitionContains(term));
         vModel.addAttribute("word", term);
         return "posts/index";
     }
