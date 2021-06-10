@@ -33,7 +33,7 @@ public class PostController {
     @GetMapping("/posts/create")
     public String createPosts(Model model) {
         model.addAttribute("post", new Post());
-        return "lex_posts/create";
+        return "posts/create";
     }
 
     @PostMapping("/posts/create")
@@ -44,7 +44,7 @@ public class PostController {
         // set the user
         postToCreate.setOwner(userToAdd);
         Post savedPost = postDao.save(postToCreate);
-        return "redirect:/lex_posts";
+        return "redirect:/posts";
     }
 
     @GetMapping("/posts/{id}/update")
@@ -57,6 +57,6 @@ public class PostController {
     public String searchPosts(@RequestParam(name = "word") String term, Model vModel) {
         vModel.addAttribute("posts", postDao.findAllByContentContains(term));
         vModel.addAttribute("word", term);
-        return "index";
+        return "posts/index";
     }
 }
