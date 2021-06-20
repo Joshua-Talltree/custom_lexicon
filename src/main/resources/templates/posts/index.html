@@ -18,12 +18,12 @@
 <main class="container">
     <br>
     <div class="row d-flex justify-content-center">
-        <div class="card text-white bg-secondary mb-3" style="max-width: 30rem;">
+        <div class="card text-dark bg-info mb-3" style="max-width: 30rem;">
             <div class="card-header">Lexicon Search</div>
             <div class="card-body">
                 <form class="d-flex" th:action="@{'/posts/search'}" method="POST">
                     <input id="searchBar" class="searchbar form-control me-2 pr-2" name="word" type="text" placeholder="Search..." aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <button class="btn btn-outline-warning" type="submit">Search</button>
                 </form>
             </div>
         </div>
@@ -33,7 +33,7 @@
         <div class="row d-flex justify-content-center">
             <div class="col-6">
                 <div th:each="post : ${posts}">
-                    <div class="card text-black bg-light mb-3 row" style="max-width: 500rem;">
+                    <div class="card text-black bg-light mb-3 row" style="max-width: 500px;">
                         <div class="card-header">
                             <h4 class="card-title" th:text="${post.number}"></h4>
                         </div>
